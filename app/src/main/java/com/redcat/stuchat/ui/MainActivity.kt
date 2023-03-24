@@ -29,6 +29,7 @@ class MainActivity : BaseDataBindingActivity() {
 
         mBinding.apply {
 
+            initMsgData()
             var tfRegular = Typeface.createFromAsset(assets, "font/karla_bold.ttf");
             tvTitle.typeface = tfRegular
             tvTitle.text = "Dear·Yhaha"
