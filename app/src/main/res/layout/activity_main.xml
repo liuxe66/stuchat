@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ui.MainActivity"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textColor="@color/color_text_main"
+                android:background="@color/color_top_bar"/>
+
+            <FrameLayout
+                android:id="@+id/fl_msg"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:orientation="horizontal"
+                android:background="@color/color_bottom_bar"/>
+            <LinearLayout
+                android:id="@+id/ll_box"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:background="@color/color_bottom_bar"/>
+        </LinearLayout>
+        <com.opensource.svgaplayer.SVGAImageView
+            android:id="@+id/svg_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:clearsAfterDetached="true"
+            app:fillMode="Clear"
+            android:background="#0000"/>
+    </FrameLayout>
+
+</layout>
