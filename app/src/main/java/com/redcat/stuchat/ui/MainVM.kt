@@ -12,6 +12,7 @@ import com.redcat.stuchat.base.BaseViewModel
 import com.redcat.stuchat.data.bean.UserBean
 import com.redcat.stuchat.data.bean.WordBean
 import com.redcat.stuchat.data.room.entity.Record
+import com.redcat.stuchat.ext.getDataYMDHMS
 import com.redcat.stuchat.utils.PrefUtils
 import com.redcat.stuchat.utils.Preference
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.lang.reflect.Type
+import java.text.SimpleDateFormat
+import java.util.Date
 
 /**
  *  author : liuxe
@@ -30,13 +33,14 @@ import java.lang.reflect.Type
  *  description :
  */
 class MainVM : BaseViewModel() {
-    private var isFirst:Boolean by Preference(Preference.isFirst,true)
+    private var isFirst: Boolean by Preference(Preference.isFirstOpen, true)
     private var wordsList: List<WordBean> by PrefUtils(PrefUtils.prefWordList, ArrayList())
     private var userData: UserBean by PrefUtils(PrefUtils.prefUser, UserBean())
     var pageLimit = 20
     var recordList = ArrayList<Record>()
     var recordData = MutableLiveData<List<Record>>()
 
+    var scrollToBottom = MutableLiveData<Boolean>()
     fun initData() = liveData<UserBean> {
         var user = UserBean(
             nickName = creatNickName(),//昵称
@@ -89,10 +93,13 @@ class MainVM : BaseViewModel() {
      * @return Job
      */
     fun getRecords() = viewModelScope.launch {
+        recordList.clear()
         withContext(Dispatchers.IO) {
             var records = RedCatApp.appDatabase.recordDao().queryPageRecord(limit = pageLimit, 0)
-            recordList.addAll(records)
+            recordList.addAll(records.reversed())
         }
+        LogUtils.e("recordList:"+recordList)
+        scrollToBottom.value = true
         recordData.value = recordList
     }
 
@@ -104,7 +111,7 @@ class MainVM : BaseViewModel() {
         withContext(Dispatchers.IO) {
             var records = RedCatApp.appDatabase.recordDao()
                 .queryPageRecord(limit = pageLimit, recordList.size)
-            recordList.addAll(records)
+            recordList.addAll(0,records.reversed())
         }
         recordData.value = recordList
     }
@@ -126,6 +133,7 @@ class MainVM : BaseViewModel() {
         wordName: String? = null, wordUs: String? = null, wordTrans: String? = null
     ) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
+
             RedCatApp.appDatabase.recordDao().insertRecord(
                 Record(
                     type = type,
@@ -136,37 +144,61 @@ class MainVM : BaseViewModel() {
                     avatar = avatar,
                     wordName = wordName,
                     wordUs = wordUs,
-                    wordTrans = wordTrans
+                    wordTrans = wordTrans,
+                    timestamp = System.currentTimeMillis()
                 )
             )
-            recordList.clear()
         }
         getRecords()
+    }
+
+    /**
+     * 插入记录
+     * @param record Record
+     * @return Job
+     */
+    fun updateRecord(
+       id:Int
+    ) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+
+            val record = RedCatApp.appDatabase.recordDao().queryById(id)
+            record.unread = 1
+
+            RedCatApp.appDatabase.recordDao().insertRecord(record)
+        }
     }
 
     /**
      * 首次使用
      */
     fun sayHello() = viewModelScope.launch {
-        //产品介绍
-        var hello = "${userData.nickName},你好，我是Yahh，是你的学习小秘书"
-        var ins = "在这里，你可以通过学习单词来增加等级以及赚取金币"
-        var ins1 = "等级有什么用？其实没什么用，哈哈哈"
-        var ins2 = "金币有什么用？金币可以买礼物，买头像框，买座驾"
-        var ins3 = "礼物有什么用？发送礼物，有礼物特效，可以看特效啊，赚大了"
-        var ins4 = "头像框和座驾有什么用？装B啊，这个太有用了"
-        insertRecord(AppConfig.type_sys_text, text = hello)
-        delay(500)
-        insertRecord(AppConfig.type_sys_text, text = ins)
-        delay(500)
-        insertRecord(AppConfig.type_sys_text, text = ins1)
-        delay(500)
-        insertRecord(AppConfig.type_sys_text, text = ins2)
-        delay(500)
-        insertRecord(AppConfig.type_sys_text, text = ins3)
-        delay(500)
-        insertRecord(AppConfig.type_sys_text, text = ins4)
-        isFirst = false
+        if (isFirst){
+            //产品介绍
+            var hello = "欢迎${userData.nickName},进入自习室，我是自习室的管理员呀哈哈"
+            var hello1 = "我们的自习室，主要目标是学习英语单词，每天任务是学习50个单词。"
+            var ins = "在这里，你可以通过学习单词来赚取金币"
+            var ins1 = "每学习一个单词会奖励10个金币，每天完成任务额外奖励100个"
+            var ins2 = "金币有什么用？要不，你慢慢探索吧？"
+            insertRecord(AppConfig.type_sys_text, text = hello)
+            delay((80 * hello.length).toLong())
+            insertRecord(AppConfig.type_sys_text, text = hello1)
+            delay((80 * hello1.length).toLong())
+            insertRecord(AppConfig.type_sys_text, text = ins)
+            delay((80 * ins.length).toLong())
+            insertRecord(AppConfig.type_sys_text, text = ins1)
+            delay((80 * ins1.length).toLong())
+            insertRecord(AppConfig.type_sys_text, text = ins2)
+            delay((80 * ins2.length).toLong())
+            isFirst = false
+            var luxun = "不满是向上的车轮。"
+            insertRecord(AppConfig.type_sys_text, text = luxun, nickName = "鲁迅", avatar = 7)
+        } else {
+            var luxun = "不满是向上的车轮。"
+            insertRecord(AppConfig.type_sys_text, text = luxun, nickName = "鲁迅", avatar = 7)
+        }
+
+
     }
 
     /**

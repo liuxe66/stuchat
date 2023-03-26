@@ -27,5 +27,8 @@ data class Record(
     //系统单词
     val wordName: String? = null,
     val wordUs: String? = null,
-    val wordTrans: String? = null
+    val wordTrans: String? = null,
+
+    val timestamp:Long,
+    var unread:Int = 0//0未读，1已读
 )

@@ -24,6 +24,10 @@
                 android:textColor="@color/color_text_main"
                 android:background="@color/color_top_bar"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0.2dp"
+                android:background="#e5e5e5"/>
             <FrameLayout
                 android:id="@+id/fl_msg"
                 android:layout_width="match_parent"

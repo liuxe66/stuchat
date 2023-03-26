@@ -1,9 +1,6 @@
 package com.redcat.stuchat.data.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.redcat.stuchat.data.room.entity.Record
 
 /**
@@ -21,4 +18,9 @@ interface RecordDao {
     @Query("SELECT * FROM record order by record.recordId desc Limit :limit Offset :offset")
     fun queryPageRecord(limit:Int,offset:Int):List<Record>
 
+    @Query("SELECT * FROM record where recordId = :recordId")
+    fun queryById(recordId:Int):Record
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updateRecord(record: Record)
 }

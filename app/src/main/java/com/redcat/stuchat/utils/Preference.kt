@@ -20,7 +20,8 @@ class Preference<T>() {
     private var defaultValue: T? = null
 
     companion object {
-        const val isFirst = "isFirst"
+        const val isFirstLoad = "isFirstLoad"
+        const val isFirstOpen = "isFirstOpen"
     }
 
     constructor(keyName: String,defaultValue: T) : this() {

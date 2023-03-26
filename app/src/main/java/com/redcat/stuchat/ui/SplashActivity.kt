@@ -8,7 +8,7 @@ import com.redcat.stuchat.utils.Preference
 
 class SplashActivity : BaseDataBindingActivity() {
 
-    private var isFirst:Boolean by Preference(Preference.isFirst,true)
+    private var isFirst:Boolean by Preference(Preference.isFirstLoad,true)
     private val mainVM by createViewModel<MainVM>()
     override fun init(savedInstanceState: Bundle?) {
         if (isFirst){
@@ -16,7 +16,7 @@ class SplashActivity : BaseDataBindingActivity() {
                 mainVM.initData().observe(this, Observer {
                     toActivity<MainActivity>()
                 })
-
+                isFirst = false
             })
         } else {
             toActivity<MainActivity>()

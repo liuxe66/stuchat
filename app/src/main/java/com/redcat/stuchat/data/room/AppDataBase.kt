@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.redcat.stuchat.data.room.dao.RecordDao
 import com.redcat.stuchat.data.room.entity.Record
-import com.redcat.stuchat.data.room.entity.Word
 
 /**
  *  author : liuxe
