@@ -15,9 +15,11 @@ import com.chad.library.adapter.base.loadState.trailing.TrailingLoadStateAdapter
 import com.liuxe.lib_common.utils.LogUtils
 import com.opensource.svgaplayer.SVGAImageView
 import com.redcat.stuchat.R
+import com.redcat.stuchat.app.AppConfig
 import com.redcat.stuchat.base.BaseDataBindingActivity
 import com.redcat.stuchat.databinding.ActivityMainBinding
 import com.redcat.stuchat.ext.*
+import kotlinx.coroutines.delay
 
 
 class MainActivity : BaseDataBindingActivity() {
@@ -35,17 +37,37 @@ class MainActivity : BaseDataBindingActivity() {
             svgView.clearsAfterDetached = true
             svgView.loops = 1
             svgView.fillMode = SVGAImageView.FillMode.Clear
-            //先加载聊天记录
-            loadRecord()
-            //初始化新数据
-            initData()
+
+            mainVM.initData()
+            mainVM.initFinish.observe(this@MainActivity, Observer {
+                mainVM.sayHello()
+            })
+            mainVM.recordData.observe(this@MainActivity, Observer {
+                mRecordAdapter.submitList(it)
+                mRecordAdapter.notifyDataSetChanged()
+            })
+            mainVM.scrollToBottom.observe(this@MainActivity, Observer {
+                mBinding.rvMsg.scrollToPosition(mainVM.recordList.size - 1)
+            })
+            mainVM.playSvga.observe(this@MainActivity, Observer {
+                mBinding.svgView.loadAssetsSVGA(fileName = getSvga(it), func = {
+                    mainVM.insertRecord(AppConfig.type_sys_text, text = "牛，牛哇，啾咪！")
+                })
+            })
+
+            mainVM.intoRoom.observe(this@MainActivity, Observer {
+                LogUtils.e("=========intoRoom========")
+                svgView.showAssetsRide(
+                    "veh_falali", 1, AppConfig.getPhoto(it.avatar), it.nickName, 10
+                )
+            })
 
             var tfRegular = Typeface.createFromAsset(assets, "font/karla_bold.ttf");
             tvTitle.typeface = tfRegular
             tvTitle.text = "Dear·Yhaha"
 
             llBottom.throttleClick {
-                loadSvga()
+                mainVM.randomEvent()
             }
             mRecordAdapter = RecordAdapter()
             mRecordAdapter.mListener = object : RecordAdapter.RecordAdapterListener {
@@ -92,25 +114,21 @@ class MainActivity : BaseDataBindingActivity() {
         }
     }
 
-    private fun initData() {
-        mainVM.sayHello()
-    }
-
-    fun loadSvga() {
-        mBinding.svgView.loadAssetsSVGA(
-            fileName = "rock"
-        )
+    private fun getSvga(image: Int?) = when (image) {
+        1 -> "gift_rose"
+        2 -> "gift_bear"
+        3 -> "gift_boom"
+        4 -> "gift_birth"
+        5 -> "gift_car"
+        6 -> "gift_firework"
+        7 -> "gift_rock"
+        8 -> "gift_room"
+        else -> "gift_rose"
     }
 
     private fun loadRecord() {
         mainVM.getRecords()
-        mainVM.recordData.observe(this, Observer {
-            mRecordAdapter.submitList(it)
-            mRecordAdapter.notifyDataSetChanged()
-        })
-        mainVM.scrollToBottom.observe(this, Observer {
-            mBinding.rvMsg.scrollToPosition(mainVM.recordList.size - 1)
-        })
+
     }
 
     private val TIME_EXIT = 2000

@@ -13,7 +13,7 @@ class SplashActivity : BaseDataBindingActivity() {
     override fun init(savedInstanceState: Bundle?) {
         if (isFirst){
             mainVM.loadWord().observe(this, Observer {
-                mainVM.initData().observe(this, Observer {
+                mainVM.initUser().observe(this, Observer {
                     toActivity<MainActivity>()
                 })
                 isFirst = false

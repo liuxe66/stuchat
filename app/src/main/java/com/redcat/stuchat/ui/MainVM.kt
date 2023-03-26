@@ -12,7 +12,6 @@ import com.redcat.stuchat.base.BaseViewModel
 import com.redcat.stuchat.data.bean.UserBean
 import com.redcat.stuchat.data.bean.WordBean
 import com.redcat.stuchat.data.room.entity.Record
-import com.redcat.stuchat.ext.getDataYMDHMS
 import com.redcat.stuchat.utils.PrefUtils
 import com.redcat.stuchat.utils.Preference
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +23,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.lang.reflect.Type
-import java.text.SimpleDateFormat
-import java.util.Date
 
 /**
  *  author : liuxe
@@ -36,13 +33,16 @@ class MainVM : BaseViewModel() {
     private var isFirst: Boolean by Preference(Preference.isFirstOpen, true)
     private var wordsList: List<WordBean> by PrefUtils(PrefUtils.prefWordList, ArrayList())
     private var userData: UserBean by PrefUtils(PrefUtils.prefUser, UserBean())
-    var pageLimit = 20
+    var pageLimit = 100
     var recordList = ArrayList<Record>()
     var recordData = MutableLiveData<List<Record>>()
 
     var scrollToBottom = MutableLiveData<Boolean>()
-    fun initData() = liveData<UserBean> {
-        var user = UserBean(
+    var playSvga = MutableLiveData<Int>()
+    var intoRoom = MutableLiveData<UserBean>()
+    var initFinish = MutableLiveData<Long>()
+    fun initUser() = liveData<UserBean> {
+        val user = UserBean(
             nickName = creatNickName(),//昵称
             avatar = creatAvatar(),//头像
             coin = 1000,//金币
@@ -51,6 +51,7 @@ class MainVM : BaseViewModel() {
             level = 1,//等级
             value = 0//经验值
         )
+        userData = user
         LogUtils.e("" + user.toString())
         emit(user)
     }
@@ -98,9 +99,21 @@ class MainVM : BaseViewModel() {
             var records = RedCatApp.appDatabase.recordDao().queryPageRecord(limit = pageLimit, 0)
             recordList.addAll(records.reversed())
         }
-        LogUtils.e("recordList:"+recordList)
+        LogUtils.e("recordList:" + recordList)
         scrollToBottom.value = true
         recordData.value = recordList
+    }
+
+    fun initData() = viewModelScope.launch {
+        recordList.clear()
+        withContext(Dispatchers.IO) {
+            var records = RedCatApp.appDatabase.recordDao().queryPageRecord(limit = pageLimit, 0)
+            recordList.addAll(records.reversed())
+        }
+        LogUtils.e("recordList:" + recordList)
+        scrollToBottom.value = true
+        recordData.value = recordList
+        initFinish.value = System.currentTimeMillis()
     }
 
     /**
@@ -111,7 +124,7 @@ class MainVM : BaseViewModel() {
         withContext(Dispatchers.IO) {
             var records = RedCatApp.appDatabase.recordDao()
                 .queryPageRecord(limit = pageLimit, recordList.size)
-            recordList.addAll(0,records.reversed())
+            recordList.addAll(0, records.reversed())
         }
         recordData.value = recordList
     }
@@ -158,14 +171,14 @@ class MainVM : BaseViewModel() {
      * @return Job
      */
     fun updateRecord(
-       id:Int
+        id: Int
     ) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
 
             val record = RedCatApp.appDatabase.recordDao().queryById(id)
             record.unread = 1
 
-            RedCatApp.appDatabase.recordDao().insertRecord(record)
+            RedCatApp.appDatabase.recordDao().updateRecord(record)
         }
     }
 
@@ -173,7 +186,7 @@ class MainVM : BaseViewModel() {
      * 首次使用
      */
     fun sayHello() = viewModelScope.launch {
-        if (isFirst){
+        if (isFirst) {
             //产品介绍
             var hello = "欢迎${userData.nickName},进入自习室，我是自习室的管理员呀哈哈"
             var hello1 = "我们的自习室，主要目标是学习英语单词，每天任务是学习50个单词。"
@@ -191,20 +204,60 @@ class MainVM : BaseViewModel() {
             insertRecord(AppConfig.type_sys_text, text = ins2)
             delay((80 * ins2.length).toLong())
             isFirst = false
-            var luxun = "不满是向上的车轮。"
-            insertRecord(AppConfig.type_sys_text, text = luxun, nickName = "鲁迅", avatar = 7)
-        } else {
-            var luxun = "不满是向上的车轮。"
-            insertRecord(AppConfig.type_sys_text, text = luxun, nickName = "鲁迅", avatar = 7)
         }
-
-
+        randomEvent()
     }
 
     /**
      * 随机事件
      */
-    fun randomEvent() {
+    fun randomEvent() = viewModelScope.launch {
+        when ((1 until 6).random()) {
+            1 -> {
+                val luxun = " 我家门前有两棵树，一棵是枣树，另一棵也是枣树。"
+                insertRecord(
+                    AppConfig.type_sys_text,
+                    text = luxun,
+                    nickName = creatNickName(),
+                    avatar = creatAvatar()
+                )
+            }
+            2 -> {
+                val user = UserBean(nickName = creatNickName(), avatar = creatAvatar())
+                insertRecord(AppConfig.type_sys_notice, text = "欢迎${user.nickName}进入自习室")
+                intoRoom.value = user
+            }
+            3 -> {
+                val image = creatImage()
+                insertRecord(
+                    AppConfig.type_sys_pic,
+                    image = image,
+                    nickName = creatNickName(),
+                    avatar = creatAvatar()
+                )
+                playSvga.value = image
+            }
+            4 -> {
+                val luxun = "help me"
+                insertRecord(
+                    AppConfig.type_user_text,
+                    text = luxun,
+                    nickName = creatNickName(),
+                    avatar = creatAvatar()
+                )
+            }
+            5 -> {
+                val image = creatImage()
+                insertRecord(
+                    AppConfig.type_user_pic,
+                    image = image,
+                    nickName = creatNickName(),
+                    avatar = creatAvatar()
+                )
+                playSvga.value = image
+            }
+            else -> {}
+        }
 
     }
 
@@ -222,7 +275,7 @@ class MainVM : BaseViewModel() {
         nickNameList.add("猴哥")
         nickNameList.add("叁三")
         nickNameList.add("瓦妹里仔仔")
-        var index = (0 until nickNameList.size - 1).random()
+        var index = (1 until nickNameList.size).random()
         return nickNameList[index]
     }
 
@@ -231,6 +284,14 @@ class MainVM : BaseViewModel() {
      * @return Int
      */
     fun creatAvatar(): Int {
-        return (1 until 14).random()
+        return (1 until 8).random()
+    }
+
+    /**
+     * 随机创建头像
+     * @return Int
+     */
+    fun creatImage(): Int {
+        return (1 until 9).random()
     }
 }

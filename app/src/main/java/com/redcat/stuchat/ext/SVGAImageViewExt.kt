@@ -1,16 +1,20 @@
 package com.redcat.stuchat.ext
 
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.text.TextPaint
 import androidx.core.view.isVisible
+import coil.Coil
+import com.bumptech.glide.Glide
 import com.liuxe.lib_common.utils.LogUtils
-import com.opensource.svgaplayer.SVGADrawable
-import com.opensource.svgaplayer.SVGAImageView
-import com.opensource.svgaplayer.SVGAParser
-import com.opensource.svgaplayer.SVGAVideoEntity
+import com.opensource.svgaplayer.*
+import com.redcat.stuchat.ui.widgets.GlideCircleFrame
+import com.redcat.stuchat.ui.widgets.GlideCustomTarget
 import java.net.URL
 
 
-fun SVGAImageView.loadAssetsSVGA(fileName: String, times: Int = 1) {
-    showSVGAFile(fileName, times)
+fun SVGAImageView.loadAssetsSVGA(fileName: String, times: Int = 1,func: () -> Unit = {}) {
+    showSVGAFile(fileName, times, complete = { func() })
 }
 
 inline fun SVGAImageView.showLinkSVGA(
@@ -110,4 +114,106 @@ fun SVGAImageView.loadLinkSVGA(link: String? = null, times: Int = 1) {
         })
     } catch (t: Throwable) {
     }
+}
+
+
+fun SVGAImageView.showLinkRide(link: String?, times: Int = 1, avatar: String? = null, userName: String? = null, sp: Int = 10) {
+
+    if (isAnimating) {
+        return
+    }
+
+    if (link.isNullOrEmpty()) {
+        return
+    }
+    avatar?.let {
+
+        showLinkSVGA(link, times, complete = { videoEntity ->
+
+            if (!context.checkDestroy()) {
+                return@showLinkSVGA
+            }
+
+            try {
+
+
+                Glide.with(context)
+                    .asBitmap()
+                    .centerCrop().transform(GlideCircleFrame(borderWidth = 4, borderColor = Color.WHITE))
+                    .load(avatar)
+                    .into(GlideCustomTarget<Bitmap>(ready = { bitmap ->
+
+                        try {
+                            val dynamicEntity = SVGADynamicEntity()
+                            //设置头像
+                            dynamicEntity.setDynamicImage(bitmap, "key_ride_avatar")
+//                                dynamicEntity.setDynamicImage(bitmap, "img_joinRoomHasMountsAvatarKey")
+                            //设置内容
+                            val objPaint = TextPaint()
+                            objPaint.color = Color.parseColor("#ffffff")
+                            objPaint.textSize = sp.sp()
+                            dynamicEntity.setDynamicText("$userName 进入自习室", objPaint, "key_ride_banner")
+//                                dynamicEntity.setDynamicText("$userName into the room", objPaint, "img_joinRoomTextKey")
+
+                            setImageDrawable(SVGADrawable(videoEntity, dynamicEntity))
+                            startAnimation()
+                        } catch (e: Throwable) {
+                        }
+
+                    }))
+            } catch (e: Throwable) {
+
+            }
+        })
+
+    } ?: showLinkSVGA(link, times)
+
+}
+
+
+
+fun SVGAImageView.showAssetsRide(fileName: String, times: Int = 1, avatar: Int? = null, userName: String? = null, sp: Int = 10) {
+
+    if (isAnimating) {
+        return
+    }
+
+    avatar?.let {
+
+        showSVGAFile(fileName, times, complete = { videoEntity ->
+
+            try {
+
+                Glide.with(context)
+                    .asBitmap()
+                    .centerCrop().transform(GlideCircleFrame(borderWidth = 4, borderColor = Color.WHITE))
+                    .load(context.resources.getDrawable(avatar))
+                    .into(GlideCustomTarget<Bitmap>(ready = { bitmap ->
+
+                        try {
+                            val dynamicEntity = SVGADynamicEntity()
+                            //设置头像
+                            dynamicEntity.setDynamicImage(bitmap, "key_ride_avatar")
+//                                dynamicEntity.setDynamicImage(bitmap, "img_joinRoomHasMountsAvatarKey")
+                            //设置内容
+                            val objPaint = TextPaint()
+                            objPaint.color = Color.parseColor("#ffffff")
+                            objPaint.textSize = sp.sp()
+                            dynamicEntity.setDynamicText("$userName 进入自习室", objPaint, "key_ride_banner")
+//                                dynamicEntity.setDynamicText("$userName into the room", objPaint, "img_joinRoomTextKey")
+
+                            setImageDrawable(SVGADrawable(videoEntity, dynamicEntity))
+                            startAnimation()
+                        } catch (e: Throwable) {
+                        }
+
+                    }))
+            } catch (e: Throwable) {
+
+            }
+        })
+
+    } ?: showSVGAFile(fileName, times)
+
+
 }

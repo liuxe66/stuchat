@@ -35,5 +35,29 @@ class AppConfig {
         //1700-2300 600 ->8
         //2300-3000 700 ->9
         //3000-  ->10
+
+        fun getPhoto(image: Int?) = when (image) {
+            1 -> R.drawable.ic_avatar1
+            2 -> R.drawable.ic_avatar2
+            3 -> R.drawable.ic_avatar3
+            4 -> R.drawable.ic_avatar4
+            5 -> R.drawable.ic_avatar5
+            6 -> R.drawable.ic_avatar6
+            7 -> R.drawable.ic_avatar_luxun
+            else -> R.drawable.ic_logo
+        }
+
+        fun getImage(image: Int?) = when (image) {
+            1 -> R.drawable.ic_gift_rose
+            2 -> R.drawable.ic_gift_bear
+            3 -> R.drawable.ic_gift_boom
+            4 -> R.drawable.ic_gift_birth
+            5 -> R.drawable.ic_gift_car
+            6 -> R.drawable.ic_gift_firework
+            7 -> R.drawable.ic_gift_rocket
+            8 -> R.drawable.ic_gift_room
+            else -> R.drawable.ic_gift_rose
+        }
+
     }
 }

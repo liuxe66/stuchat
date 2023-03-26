@@ -35,12 +35,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:background="@drawable/shape_left_bg"
+            android:lineSpacingMultiplier="1.2"
             android:padding="12dp"
             android:textColor="@color/color_text_main"
             android:textSize="16sp"
-            android:lineSpacingMultiplier="1.2"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@id/tv_left_nick"
-            app:layout_constraintTop_toBottomOf="@id/tv_left_nick" />
+            app:layout_constraintTop_toBottomOf="@id/tv_left_nick"
+            app:layout_constraintWidth_default="wrap" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
