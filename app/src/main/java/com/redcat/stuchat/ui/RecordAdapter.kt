@@ -14,8 +14,14 @@ import com.chad.library.adapter.base.BaseMultiItemAdapter
 import com.liuxe.lib_common.utils.LogUtils
 import com.redcat.stuchat.R
 import com.redcat.stuchat.app.AppConfig
+import com.redcat.stuchat.app.AppConfig.Companion.getFrameSvga
+import com.redcat.stuchat.app.AppConfig.Companion.getImage
+import com.redcat.stuchat.app.AppConfig.Companion.getPhoto
 import com.redcat.stuchat.data.room.entity.Record
 import com.redcat.stuchat.databinding.*
+import com.redcat.stuchat.ext.loadAssetsSVGA
+import com.redcat.stuchat.ext.showAssetsAvatar
+import com.redcat.stuchat.ext.showSVGAFile
 import com.redcat.stuchat.utils.DimenUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -33,11 +39,17 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
         RecyclerView.ViewHolder(viewBinding.root)
     class ItemTypeLeftImageVH(val viewBinding: ItemTypeLeftImageBinding) :
         RecyclerView.ViewHolder(viewBinding.root)
+    //通知
     class ItemTypeLeftNoticeVH(val viewBinding: ItemTypeLeftNoticeBinding) :
         RecyclerView.ViewHolder(viewBinding.root)
+    //右文字
     class ItemTypeRightVH(val viewBinding: ItemTypeRightTextBinding) :
         RecyclerView.ViewHolder(viewBinding.root)
+    //右图片
     class ItemTypeRightImageVH(val viewBinding: ItemTypeRightImageBinding) :
+        RecyclerView.ViewHolder(viewBinding.root)
+    //单词
+    class ItemTypeLeftWordVH(val viewBinding: ItemTypeLeftWordBinding) :
         RecyclerView.ViewHolder(viewBinding.root)
     init {
         addItemType(AppConfig.type_sys_text,
@@ -52,21 +64,24 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                 }
 
                 override fun onBind(holder: ItemTypeLeftVH, position: Int, item: Record?) {
-//                    LogUtils.e("item:" + item.toString())
+
                     // 绑定 item 数据
-                    var image = getPhoto(item?.avatar)
                     holder.viewBinding.apply {
                         if (item != null) {
-                            ivLeftPhoto.load(image) {
+                            if (getFrameSvga(item.frame) != ""){
+                                svgView.showSVGAFile(getFrameSvga(item?.avatar))
+                            }
+                            ivLeftPhoto.load(getPhoto(item?.avatar)) {
                                 transformations(CircleCropTransformation())
                             }
                             tvLeftNick.text = item?.nickName ?: "呀哈哈"
 
-                            tvLeftText.text = item.text
-
-                            if (item.unread == 0) {
-                                mListener?.onLoadFinish(item.recordId)
-                            }
+//                            if (item.unread == 0){
+//                                showText(tvLeftText,item.text)
+//                                mListener?.onLoadFinish(position,item.recordId)
+//                            } else {
+                                tvLeftText.text = item.text
+//                            }
                         }
 
                     }
@@ -85,7 +100,13 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                 override fun onBind(holder: ItemTypeLeftNoticeVH, position: Int, item: Record?) {
                     holder.viewBinding.apply {
                         if (item != null) {
+                            ivLeftPhoto.load(R.drawable.ic_avatar){
+                                transformations(CircleCropTransformation())
+                            }
                             tvLeftText.text = item.text
+                            if (item.unread == 0) {
+                                mListener?.onLoadFinish(position,item.recordId)
+                            }
                         }
 
                     }
@@ -106,6 +127,9 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
 
                         holder.viewBinding.apply {
                             if (item != null) {
+                                if (getFrameSvga(item.frame) != ""){
+                                    svgView.showSVGAFile(getFrameSvga(item?.avatar))
+                                }
                                 ivLeftPhoto.load(getPhoto(item?.avatar)) {
                                     transformations(CircleCropTransformation())
                                 }
@@ -116,7 +140,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                                 }
 
                                 if (item.unread == 0) {
-                                    mListener?.onLoadFinish(item.recordId)
+                                    mListener?.onLoadFinish(position,item.recordId)
                                 }
                             }
 
@@ -141,6 +165,9 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     var image = getPhoto(item?.avatar)
                     holder.viewBinding.apply {
                         if (item != null) {
+                            if (getFrameSvga(item.frame) != ""){
+                                svgView.showSVGAFile(getFrameSvga(item.avatar))
+                            }
                             ivLeftPhoto.load(image) {
                                 transformations(CircleCropTransformation())
                             }
@@ -149,7 +176,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                             tvLeftText.text = item.text
 
                             if (item.unread == 0) {
-                                mListener?.onLoadFinish(item.recordId)
+                                mListener?.onLoadFinish(position,item.recordId)
                             }
                         }
 
@@ -171,6 +198,9 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
 
                         holder.viewBinding.apply {
                             if (item != null) {
+                                if (getFrameSvga(item.frame) != ""){
+                                    svgView.showSVGAFile(getFrameSvga(item?.avatar))
+                                }
                                 ivLeftPhoto.load(getPhoto(item?.avatar)) {
                                     transformations(CircleCropTransformation())
                                 }
@@ -181,10 +211,38 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                                 }
 
                                 if (item.unread == 0) {
-                                    mListener?.onLoadFinish(item.recordId)
+                                    mListener?.onLoadFinish(position,item.recordId)
                                 }
                             }
 
+                        }
+
+                    }
+                }
+            }).addItemType(AppConfig.type_sys_word,
+            object : OnMultiItemAdapterListener<Record, ItemTypeLeftWordVH> { // 类型 1
+                override fun onCreate(
+                    context: Context, parent: ViewGroup, viewType: Int
+                ): ItemTypeLeftWordVH {
+                    // 创建 viewholder
+                    val viewBinding =
+                        ItemTypeLeftWordBinding.inflate(LayoutInflater.from(context), parent, false)
+                    return ItemTypeLeftWordVH(viewBinding)
+                }
+
+                override fun onBind(holder: ItemTypeLeftWordVH, position: Int, item: Record?) {
+                    holder.viewBinding.apply {
+
+                        holder.viewBinding.apply {
+                            if (item != null) {
+
+                                ivLeftPhoto.load(R.drawable.ic_avatar) {
+                                    transformations(CircleCropTransformation())
+                                }
+                                tvWordName.text = item.wordName
+                                tvWordUs.text = "[${item.wordUs}]"
+                                tvWordTrans.text = item.wordTrans
+                            }
                         }
 
                     }
@@ -199,7 +257,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
             if (text != null) {
                 for (index in text.indices) {
                     tvLeftText.text = text.subSequence(0, index)
-                    delay(80)
+                    delay(50)
                 }
             }
         }
@@ -207,31 +265,8 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
 
     }
 
-    private fun getPhoto(image: Int?) = when (image) {
-        1 -> R.drawable.ic_avatar1
-        2 -> R.drawable.ic_avatar2
-        3 -> R.drawable.ic_avatar3
-        4 -> R.drawable.ic_avatar4
-        5 -> R.drawable.ic_avatar5
-        6 -> R.drawable.ic_avatar6
-        7 -> R.drawable.ic_avatar_luxun
-        else -> R.drawable.ic_logo
-    }
-
-    private fun getImage(image: Int?) = when (image) {
-        1 -> R.drawable.ic_gift_rose
-        2 -> R.drawable.ic_gift_bear
-        3 -> R.drawable.ic_gift_boom
-        4 -> R.drawable.ic_gift_birth
-        5 -> R.drawable.ic_gift_car
-        6 -> R.drawable.ic_gift_firework
-        7 -> R.drawable.ic_gift_rocket
-        8 -> R.drawable.ic_gift_room
-        else -> R.drawable.ic_gift_rose
-    }
-
     interface RecordAdapterListener {
-        fun onLoadFinish(id: Int)
+        fun onLoadFinish(position:Int,id: Int)
     }
 
 }

@@ -13,11 +13,10 @@
 
         <ImageView
             android:id="@+id/iv_left_photo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="12dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_notice"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/tv_left_text"
             app:layout_constraintTop_toTopOf="@id/tv_left_text" />
@@ -27,9 +26,9 @@
             android:id="@+id/tv_left_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
-            android:background="@drawable/shape_left_bg"
+            android:background="@drawable/shape_left_text_bg"
             android:padding="12dp"
             android:textColor="@color/color_text_main"
             android:textSize="16sp"

@@ -15,4 +15,5 @@
     <color name="color_bottom_bar">#f7f7f7</color>
     <color name="color_text_main">#161616</color>
     <color name="color_text_sub">#888888</color>
+    <color name="color_trans">#00000000</color>
 </resources>

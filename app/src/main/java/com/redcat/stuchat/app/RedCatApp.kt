@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.Nullable
 import com.opensource.svgaplayer.SVGAParser
+import com.opensource.svgaplayer.SVGASoundManager
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.LogStrategy
 import com.orhanobut.logger.Logger
@@ -34,7 +35,15 @@ class RedCatApp : Application() {
         //log日志 Logger
         initLogger()
         SVGAParser.shareParser().init(this)
+        // 初始化音频管理器，方便管理音频播放
+        // 如果没有初始化，则默认按照原有方式加载音频
+        SVGASoundManager.init()
+
+        // 释放音频资源
+        SVGASoundManager.release()
+        SVGASoundManager.setVolume(0f)
     }
+
     /**
      * 初始化日志框架
      */
@@ -50,8 +59,7 @@ class RedCatApp : Application() {
             }
         }
 
-        val formatStrategy = PrettyFormatStrategy.newBuilder()
-            .logStrategy(logStrategy)
+        val formatStrategy = PrettyFormatStrategy.newBuilder().logStrategy(logStrategy)
             .showThreadInfo(false)   // （可选）是否显示线程信息。 默认值为true
 //            .methodCount(2)         // （可选）要显示的方法行数。 默认2
 //            .methodOffset(7)        // （可选）隐藏内部方法调用到偏移量。 默认5

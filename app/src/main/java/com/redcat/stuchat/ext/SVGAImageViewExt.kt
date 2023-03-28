@@ -1,10 +1,18 @@
 package com.redcat.stuchat.ext
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.text.TextPaint
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import coil.Coil
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+import coil.transform.CircleCropTransformation
 import com.bumptech.glide.Glide
 import com.liuxe.lib_common.utils.LogUtils
 import com.opensource.svgaplayer.*
@@ -13,14 +21,14 @@ import com.redcat.stuchat.ui.widgets.GlideCustomTarget
 import java.net.URL
 
 
-fun SVGAImageView.loadAssetsSVGA(fileName: String, times: Int = 1,func: () -> Unit = {}) {
+fun SVGAImageView.loadAssetsSVGA(fileName: String, times: Int = 1, func: () -> Unit = {}) {
     showSVGAFile(fileName, times, complete = { func() })
 }
 
 inline fun SVGAImageView.showLinkSVGA(
-        link: String, times: Int = 0,
-        crossinline complete: (videoItem: SVGAVideoEntity) -> Unit = {},
-        crossinline error: () -> Unit = {}
+    link: String, times: Int = 0,
+    crossinline complete: (videoItem: SVGAVideoEntity) -> Unit = {},
+    crossinline error: () -> Unit = {}
 
 ) {
     val callback = object : SVGAParser.ParseCompletion {
@@ -47,8 +55,8 @@ inline fun SVGAImageView.showLinkSVGA(
 }
 
 inline fun SVGAImageView.showComplete(
-        link: String? = null, fileName: String? = null,
-        crossinline func: () -> Unit = {}, times: Int = 0
+    link: String? = null, fileName: String? = null,
+    crossinline func: () -> Unit = {}, times: Int = 0
 ) {
 
 //    clearsAfterStop = true
@@ -67,9 +75,9 @@ inline fun SVGAImageView.showComplete(
 }
 
 inline fun SVGAImageView.showSVGAFile(
-        fileName: String, times: Int = 1,
-        crossinline complete: (videoItem: SVGAVideoEntity) -> Unit = {},
-        crossinline error: () -> Unit = {}
+    fileName: String, times: Int = 1,
+    crossinline complete: (videoItem: SVGAVideoEntity) -> Unit = {},
+    crossinline error: () -> Unit = {}
 
 ): SVGAParser.ParseCompletion {
     val callback = object : SVGAParser.ParseCompletion {
@@ -117,7 +125,13 @@ fun SVGAImageView.loadLinkSVGA(link: String? = null, times: Int = 1) {
 }
 
 
-fun SVGAImageView.showLinkRide(link: String?, times: Int = 1, avatar: String? = null, userName: String? = null, sp: Int = 10) {
+fun SVGAImageView.showLinkRide(
+    link: String?,
+    times: Int = 1,
+    avatar: String? = null,
+    userName: String? = null,
+    sp: Int = 10
+) {
 
     if (isAnimating) {
         return
@@ -139,7 +153,8 @@ fun SVGAImageView.showLinkRide(link: String?, times: Int = 1, avatar: String? = 
 
                 Glide.with(context)
                     .asBitmap()
-                    .centerCrop().transform(GlideCircleFrame(borderWidth = 4, borderColor = Color.WHITE))
+                    .centerCrop()
+                    .transform(GlideCircleFrame(borderWidth = 4, borderColor = Color.WHITE))
                     .load(avatar)
                     .into(GlideCustomTarget<Bitmap>(ready = { bitmap ->
 
@@ -152,7 +167,11 @@ fun SVGAImageView.showLinkRide(link: String?, times: Int = 1, avatar: String? = 
                             val objPaint = TextPaint()
                             objPaint.color = Color.parseColor("#ffffff")
                             objPaint.textSize = sp.sp()
-                            dynamicEntity.setDynamicText("$userName 进入自习室", objPaint, "key_ride_banner")
+                            dynamicEntity.setDynamicText(
+                                "$userName 进入自习室",
+                                objPaint,
+                                "key_ride_banner"
+                            )
 //                                dynamicEntity.setDynamicText("$userName into the room", objPaint, "img_joinRoomTextKey")
 
                             setImageDrawable(SVGADrawable(videoEntity, dynamicEntity))
@@ -171,8 +190,13 @@ fun SVGAImageView.showLinkRide(link: String?, times: Int = 1, avatar: String? = 
 }
 
 
-
-fun SVGAImageView.showAssetsRide(fileName: String, times: Int = 1, avatar: Int? = null, userName: String? = null, sp: Int = 10) {
+fun SVGAImageView.showAssetsRide(
+    fileName: String,
+    times: Int = 1,
+    avatar: Int? = null,
+    userName: String? = null,
+    sp: Int = 10
+) {
 
     if (isAnimating) {
         return
@@ -181,39 +205,50 @@ fun SVGAImageView.showAssetsRide(fileName: String, times: Int = 1, avatar: Int? 
     avatar?.let {
 
         showSVGAFile(fileName, times, complete = { videoEntity ->
+            var bitmap= BitmapFactory.decodeResource(context.resources, avatar)
+            val dynamicEntity = SVGADynamicEntity()
+            //设置头像
+            dynamicEntity.setDynamicImage(bitmap, "key_ride_avatar")
+            //设置内容
+            val objPaint = TextPaint()
+            objPaint.color = Color.parseColor("#ffffff")
+            objPaint.textSize = sp.sp()
+            dynamicEntity.setDynamicText("$userName 进入自习室", objPaint, "key_ride_banner")
 
-            try {
-
-                Glide.with(context)
-                    .asBitmap()
-                    .centerCrop().transform(GlideCircleFrame(borderWidth = 4, borderColor = Color.WHITE))
-                    .load(context.resources.getDrawable(avatar))
-                    .into(GlideCustomTarget<Bitmap>(ready = { bitmap ->
-
-                        try {
-                            val dynamicEntity = SVGADynamicEntity()
-                            //设置头像
-                            dynamicEntity.setDynamicImage(bitmap, "key_ride_avatar")
-//                                dynamicEntity.setDynamicImage(bitmap, "img_joinRoomHasMountsAvatarKey")
-                            //设置内容
-                            val objPaint = TextPaint()
-                            objPaint.color = Color.parseColor("#ffffff")
-                            objPaint.textSize = sp.sp()
-                            dynamicEntity.setDynamicText("$userName 进入自习室", objPaint, "key_ride_banner")
-//                                dynamicEntity.setDynamicText("$userName into the room", objPaint, "img_joinRoomTextKey")
-
-                            setImageDrawable(SVGADrawable(videoEntity, dynamicEntity))
-                            startAnimation()
-                        } catch (e: Throwable) {
-                        }
-
-                    }))
-            } catch (e: Throwable) {
-
-            }
+            setImageDrawable(SVGADrawable(videoEntity, dynamicEntity))
+            startAnimation()
         })
 
     } ?: showSVGAFile(fileName, times)
 
 
 }
+
+fun SVGAImageView.showAssetsAvatar(
+    fileName: String,
+    times: Int = 0,
+    avatar: Int? = null,
+) {
+
+    if (isAnimating) {
+        return
+    }
+
+    avatar?.let {
+
+        LogUtils.e("avatar:"+avatar)
+        showSVGAFile(fileName, times, complete = { videoEntity ->
+            var bitmap= BitmapFactory.decodeResource(context.resources, avatar)
+            val dynamicEntity = SVGADynamicEntity()
+            //设置头像
+            dynamicEntity.setDynamicImage(bitmap, "key_user_avatar")
+            setImageDrawable(SVGADrawable(videoEntity, dynamicEntity))
+            startAnimation()
+        })
+
+    }
+//        ?: showSVGAFile(fileName, times)
+
+
+}
+

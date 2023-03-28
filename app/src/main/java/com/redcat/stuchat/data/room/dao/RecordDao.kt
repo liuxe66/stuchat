@@ -1,6 +1,7 @@
 package com.redcat.stuchat.data.room.dao
 
 import androidx.room.*
+import com.redcat.stuchat.app.AppConfig
 import com.redcat.stuchat.data.room.entity.Record
 
 /**
@@ -17,6 +18,9 @@ interface RecordDao {
     //分页查询 offset代表从第几条记录“之后“开始查询，limit表明查询多少条结果
     @Query("SELECT * FROM record order by record.recordId desc Limit :limit Offset :offset")
     fun queryPageRecord(limit:Int,offset:Int):List<Record>
+
+    @Query("SELECT * FROM record WHERE type=${AppConfig.type_sys_notice} OR type=${AppConfig.type_sys_word} order by record.recordId desc Limit :limit Offset :offset")
+    fun queryPageRecordWord(limit: Int,offset: Int):List<Record>
 
     @Query("SELECT * FROM record where recordId = :recordId")
     fun queryById(recordId:Int):Record

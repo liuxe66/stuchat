@@ -16,6 +16,8 @@ class PrefUtils<T>(val name: String, private val default: T) : ReadWriteProperty
     companion object {
         const val prefWordIndex = "preWordIndex"
         const val prefWordList = "preWordList"
+        const val prefaqIndex = "preaqIndex"
+        const val prefaqList = "preaqList"
         const val prefUser = "prefUser"
     }
 

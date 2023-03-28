@@ -22,13 +22,16 @@ data class Record(
     val text: String? = null,
     //系统通知
     val notice:String? = null,
-    val nickName:String? = null,
-    val avatar:Int? = null,
+
     //系统单词
     val wordName: String? = null,
     val wordUs: String? = null,
     val wordTrans: String? = null,
-
-    val timestamp:Long,
+    //用户
+    val nickName:String? = null,
+    val avatar:Int? = null,
+    val frame:Int? = null,
+    val veh:Int? = null,
+    val timestamp:Long = System.currentTimeMillis(),
     var unread:Int = 0//0未读，1已读
 )

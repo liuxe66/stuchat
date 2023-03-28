@@ -44,7 +44,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:orientation="horizontal"
-                android:background="@color/color_bottom_bar"/>
+                android:padding="16dp"
+                android:background="@color/color_bottom_bar">
+                <TextView
+                    android:id="@+id/tv_switch"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/color_text_main"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:background="@drawable/shape_left_text_bg"/>
+                <TextView
+                    android:id="@+id/tv_next"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/color_text_main"
+                    android:textSize="16sp"
+                    android:text="下一个"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_marginStart="24dp"
+                    android:background="@drawable/shape_left_text_bg"/>
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/ll_box"
                 android:layout_width="match_parent"

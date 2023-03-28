@@ -59,5 +59,35 @@ class AppConfig {
             else -> R.drawable.ic_gift_rose
         }
 
+        fun getSvga(image: Int?) = when (image) {
+            1 -> "gift_rose"
+            2 -> "gift_bear"
+            3 -> "gift_boom"
+            4 -> "gift_birth"
+            5 -> "gift_car"
+            6 -> "gift_firework"
+            7 -> "gift_rock"
+            8 -> "gift_room"
+            else -> "gift_rose"
+        }
+
+        fun getVehSvga(ven:Int?) = when(ven){
+            1 -> "veh_lv"
+            2 -> "veh_falali"
+            3 -> "veh_maibahe"
+            4 -> "veh_air"
+            else -> ""
+        }
+
+        fun getFrameSvga(ven:Int?) = when(ven){
+            1 -> "frame1"
+            2 -> "frame2"
+            3 -> "frame3"
+            4 -> "frame4"
+            5 -> "frame5"
+            6 -> "frame6"
+            else -> ""
+        }
+
     }
 }
