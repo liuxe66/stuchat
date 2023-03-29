@@ -33,5 +33,4 @@ data class Record(
     val frame:Int? = null,
     val veh:Int? = null,
     val timestamp:Long = System.currentTimeMillis(),
-    var unread:Int = 0//0未读，1已读
 )

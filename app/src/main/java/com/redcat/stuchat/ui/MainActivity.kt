@@ -114,12 +114,7 @@ class MainActivity : BaseDataBindingActivity() {
 
             //页面适配器
             mRecordAdapter = RecordAdapter()
-            mRecordAdapter.mListener = object : RecordAdapter.RecordAdapterListener {
-                override fun onLoadFinish(position: Int, id: Int) {
-                    mainVM.updateRecord(position, id)
-                    rvMsg.scrollToPosition(mainVM.recordList.size - 1)
-                }
-            }
+
 
 
             //聊天列表

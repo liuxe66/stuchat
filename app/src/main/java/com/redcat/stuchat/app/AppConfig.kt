@@ -17,6 +17,7 @@ class AppConfig {
         const val type_sys_notice = 4
         const val type_user_text = 5
         const val type_user_pic = 6
+        const val type_timestamp = 7
 
         //用户金币
         //初次使用会送1000金币

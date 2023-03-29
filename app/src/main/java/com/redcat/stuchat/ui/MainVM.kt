@@ -9,6 +9,7 @@ import com.liuxe.lib_common.utils.LogUtils
 import com.redcat.stuchat.app.AppConfig
 import com.redcat.stuchat.app.RedCatApp
 import com.redcat.stuchat.base.BaseViewModel
+import com.redcat.stuchat.data.bean.RecordBean
 import com.redcat.stuchat.data.bean.UserBean
 import com.redcat.stuchat.data.bean.WordBean
 import com.redcat.stuchat.data.room.entity.Record
@@ -35,8 +36,8 @@ class MainVM : BaseViewModel() {
     private var wordsList: List<WordBean> by PrefUtils(PrefUtils.prefWordList, ArrayList())
     private var wordsIndex by PrefUtils(PrefUtils.prefWordIndex, 0)
 
-    private var aqList: List<String> by PrefUtils(PrefUtils.prefWordList, ArrayList())
-    private var aqIndex by PrefUtils(PrefUtils.prefWordIndex, 0)
+    private var aqList: List<String> by PrefUtils(PrefUtils.prefaqList, ArrayList())
+    private var aqIndex by PrefUtils(PrefUtils.prefaqIndex, 0)
 
     private var userData: UserBean by PrefUtils(PrefUtils.prefUser, UserBean())
 
@@ -48,8 +49,8 @@ class MainVM : BaseViewModel() {
     var pageLimit = 20
 
     //聊天记录
-    var recordList = ArrayList<Record>()
-    var recordData = MutableLiveData<List<Record>>()
+    var recordList = ArrayList<RecordBean>()
+    var recordData = MutableLiveData<List<RecordBean>>()
 
     //是否需要移动到底部
     var scrollToBottom = MutableLiveData<Boolean>()
@@ -62,6 +63,9 @@ class MainVM : BaseViewModel() {
 
     //初始化完成
     var initFinish = MutableLiveData<Long>()
+
+    //时间戳显示
+    var lastShowTimeStamp: Long = 0
 
     /**
      * 初始化用户数据
@@ -132,7 +136,8 @@ class MainVM : BaseViewModel() {
             } else {
                 RedCatApp.appDatabase.recordDao().queryPageRecord(limit = pageLimit, 0)
             }
-            recordList.addAll(records.reversed())
+            lastShowTimeStamp = records.reversed()[0].timestamp
+            recordList.addAll(formartTimestamp(records.reversed()))
         }
         scrollToBottom.value = true
         recordData.value = recordList
@@ -151,7 +156,13 @@ class MainVM : BaseViewModel() {
             } else {
                 RedCatApp.appDatabase.recordDao().queryPageRecord(limit = pageLimit, 0)
             }
-            recordList.addAll(records.reversed())
+            if (records.isNotEmpty()){
+                lastShowTimeStamp = records.reversed()[0].timestamp
+                recordList.addAll(formartTimestamp(records.reversed()))
+            } else {
+                lastShowTimeStamp = System.currentTimeMillis()
+            }
+
         }
         LogUtils.e("recordList:" + recordList)
         scrollToBottom.value = true
@@ -173,9 +184,110 @@ class MainVM : BaseViewModel() {
                 RedCatApp.appDatabase.recordDao()
                     .queryPageRecord(limit = pageLimit, recordList.size)
             }
-            recordList.addAll(0, records.reversed())
+            recordList.addAll(0, nextformartTimestamp(records.reversed()))
         }
         recordData.value = recordList
+    }
+
+    /**
+     * 下一页的时间戳 格式化
+     * @param record List<Record>
+     * @return Collection<RecordBean>
+     */
+    private fun nextformartTimestamp(record: List<Record>): Collection<RecordBean> {
+        var data = ArrayList<RecordBean>()
+        var tempTimeStamp = record[0].timestamp
+        data.add(RecordBean(type = 7, showTimestamp = tempTimeStamp))
+        record.forEach {
+            if (it.timestamp - tempTimeStamp > 300000) {
+                tempTimeStamp = it.timestamp
+                data.add(RecordBean(type = 7, showTimestamp = tempTimeStamp))
+            }
+            data.add(
+                RecordBean(
+                    recordId = it.recordId,
+                    type = it.type,
+                    image = it.image,
+                    text = it.text,
+                    notice = it.notice,
+                    wordName = it.wordName,
+                    wordUs = it.wordUs,
+                    wordTrans = it.wordTrans,
+                    nickName = it.nickName,
+                    avatar = it.avatar,
+                    frame = it.frame,
+                    veh = it.veh,
+                    timestamp = it.timestamp
+                )
+            )
+        }
+
+        return data
+    }
+
+    /**
+     * 第一页时间戳格式化
+     * @param records List<Record>
+     * @return List<RecordBean>
+     */
+    private fun formartTimestamp(records: List<Record>): List<RecordBean> {
+
+        var data = ArrayList<RecordBean>()
+        data.add(RecordBean(type = 7, showTimestamp = lastShowTimeStamp))
+        records.forEach {
+            if (it.timestamp - lastShowTimeStamp > 300000) {
+                lastShowTimeStamp = it.timestamp
+                data.add(RecordBean(type = 7, showTimestamp = lastShowTimeStamp))
+            }
+            data.add(
+                RecordBean(
+                    recordId = it.recordId,
+                    type = it.type,
+                    image = it.image,
+                    text = it.text,
+                    notice = it.notice,
+                    wordName = it.wordName,
+                    wordUs = it.wordUs,
+                    wordTrans = it.wordTrans,
+                    nickName = it.nickName,
+                    avatar = it.avatar,
+                    frame = it.frame,
+                    veh = it.veh,
+                    timestamp = it.timestamp
+                )
+            )
+        }
+
+        return data
+    }
+
+    /**
+     * 新消息
+     * @param record Record
+     */
+    fun addTimestamp(record:Record){
+        if (record.timestamp - lastShowTimeStamp > 300000) {
+            lastShowTimeStamp = record.timestamp
+            recordList.add(RecordBean(type = AppConfig.type_timestamp, showTimestamp = lastShowTimeStamp))
+        }
+        recordList.add(
+            RecordBean(
+                recordId = record.recordId,
+                type = record.type,
+                image = record.image,
+                text = record.text,
+                notice = record.notice,
+                wordName = record.wordName,
+                wordUs = record.wordUs,
+                wordTrans = record.wordTrans,
+                nickName = record.nickName,
+                avatar = record.avatar,
+                frame = record.frame,
+                veh = record.veh,
+                timestamp = record.timestamp
+            )
+        )
+
     }
 
     /**
@@ -198,44 +310,31 @@ class MainVM : BaseViewModel() {
     ) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
 
-            RedCatApp.appDatabase.recordDao().insertRecord(
-                Record(
-                    type = type,
-                    image = image,
-                    text = text,
-                    notice = notice,
+            var record =  Record(
+                type = type,
+                image = image,
+                text = text,
+                notice = notice,
 
-                    wordName = wordName,
-                    wordUs = wordUs,
-                    wordTrans = wordTrans,
+                wordName = wordName,
+                wordUs = wordUs,
+                wordTrans = wordTrans,
 
-                    nickName = nickName,
-                    avatar = avatar,
-                    frame = frame,
-                    veh = veh,
-                    timestamp = System.currentTimeMillis()
-                )
+                nickName = nickName,
+                avatar = avatar,
+                frame = frame,
+                veh = veh,
+                timestamp = System.currentTimeMillis()
             )
+            RedCatApp.appDatabase.recordDao().insertRecord(record)
+
+            addTimestamp(record)
         }
-        getRecords()
+        scrollToBottom.value = true
+        recordData.value = recordList
+
     }
 
-    /**
-     * 更新记录
-     * @param record Record
-     * @return Job
-     */
-    fun updateRecord(
-        position: Int, id: Int
-    ) = viewModelScope.launch {
-        withContext(Dispatchers.IO) {
-            val record = RedCatApp.appDatabase.recordDao().queryById(id)
-            record.unread = 1
-            RedCatApp.appDatabase.recordDao().updateRecord(record)
-        }
-        recordList[position].unread = 1
-        recordData.value = recordList
-    }
 
     /**
      * 首次使用
@@ -324,7 +423,7 @@ class MainVM : BaseViewModel() {
                 }
             }
 
-            delay(10000)
+            delay(40000)
         }
 
 

@@ -17,12 +17,14 @@ import com.redcat.stuchat.app.AppConfig
 import com.redcat.stuchat.app.AppConfig.Companion.getFrameSvga
 import com.redcat.stuchat.app.AppConfig.Companion.getImage
 import com.redcat.stuchat.app.AppConfig.Companion.getPhoto
+import com.redcat.stuchat.data.bean.RecordBean
 import com.redcat.stuchat.data.room.entity.Record
 import com.redcat.stuchat.databinding.*
 import com.redcat.stuchat.ext.loadAssetsSVGA
 import com.redcat.stuchat.ext.showAssetsAvatar
 import com.redcat.stuchat.ext.showSVGAFile
 import com.redcat.stuchat.utils.DimenUtils
+import com.redcat.stuchat.utils.TimestampUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -31,9 +33,8 @@ import kotlinx.coroutines.launch
  *Created by Liuxe on 2023/3/25 21:33
  *desc : 记录adapter
  */
-class RecordAdapter : BaseMultiItemAdapter<Record>() {
+class RecordAdapter : BaseMultiItemAdapter<RecordBean>() {
 
-    var mListener: RecordAdapterListener? = null
 
     class ItemTypeLeftVH(val viewBinding: ItemTypeLeftTextBinding) :
         RecyclerView.ViewHolder(viewBinding.root)
@@ -51,9 +52,12 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
     //单词
     class ItemTypeLeftWordVH(val viewBinding: ItemTypeLeftWordBinding) :
         RecyclerView.ViewHolder(viewBinding.root)
+    //时间戳
+    class ItemTypeTimeVH(val viewBinding: ItemTypeTimestampBinding) :
+        RecyclerView.ViewHolder(viewBinding.root)
     init {
         addItemType(AppConfig.type_sys_text,
-            object : OnMultiItemAdapterListener<Record, ItemTypeLeftVH> { // 类型 1
+            object : OnMultiItemAdapterListener<RecordBean, ItemTypeLeftVH> { // 类型 1
                 override fun onCreate(
                     context: Context, parent: ViewGroup, viewType: Int
                 ): ItemTypeLeftVH {
@@ -63,7 +67,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     return ItemTypeLeftVH(viewBinding)
                 }
 
-                override fun onBind(holder: ItemTypeLeftVH, position: Int, item: Record?) {
+                override fun onBind(holder: ItemTypeLeftVH, position: Int, item: RecordBean?) {
 
                     // 绑定 item 数据
                     holder.viewBinding.apply {
@@ -87,7 +91,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     }
                 }
             }).addItemType(AppConfig.type_sys_notice,
-            object : OnMultiItemAdapterListener<Record, ItemTypeLeftNoticeVH> { // 类型 1
+            object : OnMultiItemAdapterListener<RecordBean, ItemTypeLeftNoticeVH> { // 类型 1
                 override fun onCreate(
                     context: Context, parent: ViewGroup, viewType: Int
                 ): ItemTypeLeftNoticeVH {
@@ -97,22 +101,20 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     return ItemTypeLeftNoticeVH(viewBinding)
                 }
 
-                override fun onBind(holder: ItemTypeLeftNoticeVH, position: Int, item: Record?) {
+                override fun onBind(holder: ItemTypeLeftNoticeVH, position: Int, item: RecordBean?) {
                     holder.viewBinding.apply {
                         if (item != null) {
                             ivLeftPhoto.load(R.drawable.ic_avatar){
                                 transformations(CircleCropTransformation())
                             }
                             tvLeftText.text = item.text
-                            if (item.unread == 0) {
-                                mListener?.onLoadFinish(position,item.recordId)
-                            }
+
                         }
 
                     }
                 }
             }).addItemType(AppConfig.type_sys_pic,
-            object : OnMultiItemAdapterListener<Record, ItemTypeLeftImageVH> { // 类型 1
+            object : OnMultiItemAdapterListener<RecordBean, ItemTypeLeftImageVH> { // 类型 1
                 override fun onCreate(
                     context: Context, parent: ViewGroup, viewType: Int
                 ): ItemTypeLeftImageVH {
@@ -122,7 +124,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     return ItemTypeLeftImageVH(viewBinding)
                 }
 
-                override fun onBind(holder: ItemTypeLeftImageVH, position: Int, item: Record?) {
+                override fun onBind(holder: ItemTypeLeftImageVH, position: Int, item: RecordBean?) {
                     holder.viewBinding.apply {
 
                         holder.viewBinding.apply {
@@ -139,9 +141,6 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                                     transformations(RoundedCornersTransformation(36f))
                                 }
 
-                                if (item.unread == 0) {
-                                    mListener?.onLoadFinish(position,item.recordId)
-                                }
                             }
 
                         }
@@ -149,7 +148,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     }
                 }
             }).addItemType(AppConfig.type_user_text,
-            object : OnMultiItemAdapterListener<Record, ItemTypeRightVH> { // 类型 1
+            object : OnMultiItemAdapterListener<RecordBean, ItemTypeRightVH> { // 类型 1
                 override fun onCreate(
                     context: Context, parent: ViewGroup, viewType: Int
                 ): ItemTypeRightVH {
@@ -159,7 +158,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     return ItemTypeRightVH(viewBinding)
                 }
 
-                override fun onBind(holder: ItemTypeRightVH, position: Int, item: Record?) {
+                override fun onBind(holder: ItemTypeRightVH, position: Int, item: RecordBean?) {
 //                    LogUtils.e("item:" + item.toString())
                     // 绑定 item 数据
                     var image = getPhoto(item?.avatar)
@@ -175,15 +174,12 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
 
                             tvLeftText.text = item.text
 
-                            if (item.unread == 0) {
-                                mListener?.onLoadFinish(position,item.recordId)
-                            }
                         }
 
                     }
                 }
             }).addItemType(AppConfig.type_user_pic,
-            object : OnMultiItemAdapterListener<Record, ItemTypeRightImageVH> { // 类型 1
+            object : OnMultiItemAdapterListener<RecordBean, ItemTypeRightImageVH> { // 类型 1
                 override fun onCreate(
                     context: Context, parent: ViewGroup, viewType: Int
                 ): ItemTypeRightImageVH {
@@ -193,7 +189,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     return ItemTypeRightImageVH(viewBinding)
                 }
 
-                override fun onBind(holder: ItemTypeRightImageVH, position: Int, item: Record?) {
+                override fun onBind(holder: ItemTypeRightImageVH, position: Int, item: RecordBean?) {
                     holder.viewBinding.apply {
 
                         holder.viewBinding.apply {
@@ -210,9 +206,6 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                                     transformations(RoundedCornersTransformation(36f))
                                 }
 
-                                if (item.unread == 0) {
-                                    mListener?.onLoadFinish(position,item.recordId)
-                                }
                             }
 
                         }
@@ -220,7 +213,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     }
                 }
             }).addItemType(AppConfig.type_sys_word,
-            object : OnMultiItemAdapterListener<Record, ItemTypeLeftWordVH> { // 类型 1
+            object : OnMultiItemAdapterListener<RecordBean, ItemTypeLeftWordVH> { // 类型 1
                 override fun onCreate(
                     context: Context, parent: ViewGroup, viewType: Int
                 ): ItemTypeLeftWordVH {
@@ -230,7 +223,7 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
                     return ItemTypeLeftWordVH(viewBinding)
                 }
 
-                override fun onBind(holder: ItemTypeLeftWordVH, position: Int, item: Record?) {
+                override fun onBind(holder: ItemTypeLeftWordVH, position: Int, item: RecordBean?) {
                     holder.viewBinding.apply {
 
                         holder.viewBinding.apply {
@@ -247,7 +240,30 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
 
                     }
                 }
-            }).onItemViewType { position, list -> // 根据数据，返回对应的 ItemViewType
+            })
+            .addItemType(AppConfig.type_timestamp,
+                object : OnMultiItemAdapterListener<RecordBean, ItemTypeTimeVH> { // 类型 1
+                    override fun onCreate(
+                        context: Context, parent: ViewGroup, viewType: Int
+                    ): ItemTypeTimeVH {
+                        // 创建 viewholder
+                        val viewBinding =
+                            ItemTypeTimestampBinding.inflate(LayoutInflater.from(context), parent, false)
+                        return ItemTypeTimeVH(viewBinding)
+                    }
+
+                    override fun onBind(holder: ItemTypeTimeVH, position: Int, item: RecordBean?) {
+                        holder.viewBinding.apply {
+
+                            holder.viewBinding.apply {
+                                if (item != null) {
+                                    tvTime.text = TimestampUtils.getTimeString(item.showTimestamp!!)
+                                }
+                            }
+
+                        }
+                    }
+                }).onItemViewType { position, list -> // 根据数据，返回对应的 ItemViewType
             list[position].type
         }
     }
@@ -263,10 +279,6 @@ class RecordAdapter : BaseMultiItemAdapter<Record>() {
         }
 
 
-    }
-
-    interface RecordAdapterListener {
-        fun onLoadFinish(position:Int,id: Int)
     }
 
 }
