@@ -18,7 +18,12 @@ class PrefUtils<T>(val name: String, private val default: T) : ReadWriteProperty
         const val prefWordList = "preWordList"
         const val prefaqIndex = "preaqIndex"
         const val prefaqList = "preaqList"
+        const val prefluxunIndex = "prefluxunIndex"
+        const val prefluxunList = "prefluxunList"
         const val prefUser = "prefUser"
+        const val prefUserList = "prefUserList"
+
+        const val prefLastTime = "prefLastTime"
     }
 
     private val mmkv: MMKV by lazy {

@@ -16,5 +16,6 @@ data class UserBean(
     var frame: Int = 0,//头像框
     var veh: Int = 0,//座驾
     var level: Int = 1,//等级
-    var value: Int = 0//经验值
+    var value: Int = 0,//经验值
+    var wordNum: Int = 0//单词数
 ) : Serializable

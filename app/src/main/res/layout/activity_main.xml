@@ -42,30 +42,42 @@
             <LinearLayout
                 android:id="@+id/ll_bottom"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="64dp"
                 android:orientation="horizontal"
-                android:padding="16dp"
-                android:background="@color/color_bottom_bar">
-                <TextView
-                    android:id="@+id/tv_switch"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_text_main"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:background="@drawable/shape_left_text_bg"/>
-                <TextView
-                    android:id="@+id/tv_next"
+                >
+                <FrameLayout
+                    android:id="@+id/fl_chat"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:textColor="@color/color_text_main"
-                    android:textSize="16sp"
-                    android:text="下一个"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:layout_marginStart="24dp"
-                    android:background="@drawable/shape_left_text_bg"/>
+                    android:layout_weight="1">
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_chat"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/fl_word"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_word"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/fl_rank"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_rank"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/ll_box"

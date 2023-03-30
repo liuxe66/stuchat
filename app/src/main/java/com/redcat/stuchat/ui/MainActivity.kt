@@ -1,13 +1,11 @@
 package com.redcat.stuchat.ui
 
+import android.content.Intent
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.media.MediaPlayer
-import android.media.MediaSync
-import android.media.MediaSync.OnErrorListener
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -64,9 +62,9 @@ class MainActivity : BaseDataBindingActivity() {
                 })
                 playSvga.observe(this@MainActivity, Observer {
                     if (!mainVM.isLearnWord) {
-//                        svgView.loadAssetsSVGA(fileName = AppConfig.getSvga(it), func = {
-//                            mainVM.insertRecord(AppConfig.type_sys_text, text = "牛，牛哇，啾咪！")
-//                        })
+                        svgView.loadAssetsSVGA(fileName = AppConfig.getSvga(it), func = {
+                            mainVM.insertRecord(AppConfig.type_sys_text, text = "牛，牛哇，啾咪！")
+                        })
                     }
 
                 })
@@ -88,12 +86,9 @@ class MainActivity : BaseDataBindingActivity() {
                 })
                 isLearnWordData.observe(this@MainActivity, Observer {
                     if (it) {
-                        mainVM.creatWord()
-                        tvSwitch.text = "放松一下"
-                        tvNext.visible()
+
                     } else {
-                        tvSwitch.text = "开始学习"
-                        tvNext.gone()
+
                     }
                 })
             }
@@ -103,13 +98,25 @@ class MainActivity : BaseDataBindingActivity() {
             tvTitle.typeface = tfRegular
             tvTitle.text = "呀哈哈·自习室"
 
-            //切换模式
-            tvSwitch.throttleClick {
-                mainVM.changeLearnModel()
+            //排行榜
+            flRank.throttleClick {
+                showRankDialog()
+//                mainVM.changeLearnModel()
             }
-            //下一个单词
-            tvNext.throttleClick {
-                mainVM.creatWord()
+            //闲聊
+            flChat.throttleClick {
+                mainVM.isLearnWord = false
+                mainVM.getRecords()
+            }
+            //背单词
+            flWord.throttleClick {
+                if (mainVM.isLearnWord){
+                    mainVM.creatWord()
+                } else {
+                    mainVM.isLearnWord = true
+                    mainVM.getRecords()
+                }
+
             }
 
             //页面适配器
@@ -145,7 +152,7 @@ class MainActivity : BaseDataBindingActivity() {
                     val childCount = parent.adapter!!.itemCount
                     val childAdapterPosition = parent.getChildAdapterPosition(view)
                     if (childAdapterPosition == childCount - 1) {
-                        outRect.set(0, 0, 0, 10.dp().toInt());
+                        outRect.set(0, 0, 0, 18.dp().toInt());
                     } else {
                         outRect.set(0, 0, 0, 0);
                     }
@@ -153,6 +160,16 @@ class MainActivity : BaseDataBindingActivity() {
             })
 
         }
+    }
+
+    /**
+     * 排行榜弹窗
+     */
+    private fun showRankDialog() {
+
+        val rankDialog =
+            BottomRankDialog()
+        rankDialog.show(supportFragmentManager, "rank")
     }
 
     /**
@@ -186,16 +203,20 @@ class MainActivity : BaseDataBindingActivity() {
     private val TIME_EXIT = 2000
     private var mBackPressed: Long = 0
     override fun onBackPressed() {
-        if (mBinding.llBox.isVisible()) {
-            mBinding.llBox.gone()
-        } else {
-            if (mBackPressed + TIME_EXIT > System.currentTimeMillis()) {
-                super.onBackPressed();
-            } else {
-                Toast.makeText(this, "再点击一次返回退出程序", Toast.LENGTH_SHORT).show();
-                mBackPressed = System.currentTimeMillis();
-            }
-        }
+//        if (mBinding.llBox.isVisible()) {
+//            mBinding.llBox.gone()
+//        } else {
+//            if (mBackPressed + TIME_EXIT > System.currentTimeMillis()) {
+//                super.onBackPressed();
+//            } else {
+//                Toast.makeText(this, "再点击一次返回退出程序", Toast.LENGTH_SHORT).show();
+//                mBackPressed = System.currentTimeMillis();
+//            }
+//        }
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.addCategory(Intent.CATEGORY_HOME)
+        startActivity(intent)
     }
 
 }

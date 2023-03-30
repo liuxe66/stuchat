@@ -170,8 +170,6 @@ class RecordAdapter : BaseMultiItemAdapter<RecordBean>() {
                             ivLeftPhoto.load(image) {
                                 transformations(CircleCropTransformation())
                             }
-                            tvLeftNick.text = item?.nickName ?: "呀哈哈"
-
                             tvLeftText.text = item.text
 
                         }
@@ -200,8 +198,6 @@ class RecordAdapter : BaseMultiItemAdapter<RecordBean>() {
                                 ivLeftPhoto.load(getPhoto(item?.avatar)) {
                                     transformations(CircleCropTransformation())
                                 }
-                                tvLeftNick.text = item?.nickName ?: "呀哈哈"
-
                                 ivLeftImage.load(getImage(item?.image)) {
                                     transformations(RoundedCornersTransformation(36f))
                                 }
@@ -229,7 +225,7 @@ class RecordAdapter : BaseMultiItemAdapter<RecordBean>() {
                         holder.viewBinding.apply {
                             if (item != null) {
 
-                                ivLeftPhoto.load(R.drawable.ic_avatar) {
+                                ivLeftPhoto.load(R.drawable.ic_logo) {
                                     transformations(CircleCropTransformation())
                                 }
                                 tvWordName.text = item.wordName

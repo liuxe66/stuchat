@@ -24,7 +24,9 @@ class SplashActivity : BaseDataBindingActivity() {
                 isFirst = false
             })
         } else {
-            toActivity<MainActivity>()
+            mainVM.updateUserList().observe(this, Observer {
+                toActivity<MainActivity>()
+            })
         }
 
     }

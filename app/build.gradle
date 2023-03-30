@@ -140,4 +140,6 @@ dependencies {
 
     implementation "io.github.cymchad:BaseRecyclerViewAdapterHelper:4.0.0-beta04"
     implementation "com.github.bumptech.glide:glide:4.9.0"
+
+    implementation 'androidx.core:core-splashscreen:1.0.0-beta02'
 }

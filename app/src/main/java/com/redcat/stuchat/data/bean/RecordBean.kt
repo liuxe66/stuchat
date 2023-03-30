@@ -24,6 +24,7 @@ data class RecordBean(
     val wordName: String? = null,
     val wordUs: String? = null,
     val wordTrans: String? = null,
+    val wordIsTest:Int? = 0,
     //用户
     val nickName: String? = null,
     val avatar: Int? = null,

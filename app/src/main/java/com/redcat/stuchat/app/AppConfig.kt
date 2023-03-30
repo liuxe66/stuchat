@@ -38,13 +38,20 @@ class AppConfig {
         //3000-  ->10
 
         fun getPhoto(image: Int?) = when (image) {
-            1 -> R.drawable.ic_avatar1
-            2 -> R.drawable.ic_avatar2
-            3 -> R.drawable.ic_avatar3
-            4 -> R.drawable.ic_avatar4
-            5 -> R.drawable.ic_avatar5
-            6 -> R.drawable.ic_avatar6
-            7 -> R.drawable.ic_avatar_luxun
+
+            0 -> R.drawable.ic_avatar1
+            1 -> R.drawable.ic_avatar2
+            2 -> R.drawable.ic_avatar3
+            3 -> R.drawable.ic_avatar4
+            4 -> R.drawable.ic_avatar5
+            5 -> R.drawable.ic_avatar6
+            6 -> R.drawable.ic_avatar7
+            7 -> R.drawable.ic_avatar8
+            8 -> R.drawable.ic_avatar9
+            10 -> R.drawable.ic_avatar10
+
+            99 ->R.drawable.ic_avatar
+            100 ->R.drawable.ic_avatar_luxun
             else -> R.drawable.ic_logo
         }
 
