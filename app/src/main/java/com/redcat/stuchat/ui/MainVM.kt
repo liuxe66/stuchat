@@ -26,6 +26,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.lang.reflect.Type
+import java.util.Collections
 
 /**
  *  author : liuxe
@@ -81,6 +82,7 @@ class MainVM : BaseViewModel() {
      */
     fun initUser() = liveData<UserBean> {
         val user = UserBean(
+            userId = 0,
             nickName = "靓仔",//昵称
             avatar = 99,//头像
             coin = 1000,//金币
@@ -93,7 +95,7 @@ class MainVM : BaseViewModel() {
         for (index in 0 until 9) {
             listdata.add(
                 UserBean(
-                    nickName = creatNickName(index),//昵称
+                    userId = index + 10, nickName = creatNickName(index),//昵称
                     avatar = index,//头像
                     frame = creatFrame(),//头像框
                     veh = creatVeh(),//座驾
@@ -166,6 +168,8 @@ class MainVM : BaseViewModel() {
             val gson = Gson()
             val wordType: Type = object : TypeToken<List<WordBean>>() {}.type
             wordsList = gson.fromJson(str, wordType)
+            Collections.shuffle(wordsList)
+            wordsList = wordsList
             LogUtils.e("wordList:" + wordsList.size)
 
             // 解析Json数据
@@ -451,34 +455,34 @@ class MainVM : BaseViewModel() {
      */
     fun randomEvent() = viewModelScope.launch {
         while (true) {
-            when ((1 until 10).random()) {
-                1 -> {
+            when ((1 until 50).random()) {
+                1, 2, 3, 4, 5 -> {
                     creatLuxun()
                 }
-                2 -> {
+                6, 7, 8, 9, 10 -> {
                     val user = UserBean(
                         nickName = createUser().nickName,
                         avatar = createUser().avatar,
-                        frame = creatFrame(),
-                        veh = creatVeh()
+                        frame = createUser().frame,
+                        veh = createUser().veh
                     )
                     insertRecord(AppConfig.type_sys_notice, text = "欢迎${user.nickName}进入自习室")
                     intoRoom.value = user
                 }
-                3 -> {
+                11, 12 -> {
                     val image = creatImage()
                     insertRecord(
                         AppConfig.type_sys_pic,
                         image = image,
                         nickName = createUser().nickName,
                         avatar = createUser().avatar,
-                        frame = creatFrame(),
-                        veh = creatVeh()
+                        frame = createUser().frame,
+                        veh = createUser().veh
                     )
                     playSvga.value = image
                 }
-                4 -> {
-                    val luxun = "行行行，你说得对"
+                13, 14, 15 -> {
+                    val luxun = "行行行，你说得都对"
                     insertRecord(
                         AppConfig.type_user_text,
                         text = luxun,
@@ -488,7 +492,7 @@ class MainVM : BaseViewModel() {
                         veh = userData.veh
                     )
                 }
-                5 -> {
+                16 -> {
                     val image = creatImage()
                     insertRecord(
                         AppConfig.type_user_pic,
@@ -525,7 +529,7 @@ class MainVM : BaseViewModel() {
      */
     fun creatNickName(index: Int): String {
         var nickNameList = ArrayList<String>()
-        nickNameList.add("轻狂、")
+        nickNameList.add("轻Q")
         nickNameList.add("落单")
         nickNameList.add("白龙")
         nickNameList.add("公主")
@@ -578,21 +582,30 @@ class MainVM : BaseViewModel() {
      * 创建单词
      */
     fun creatWord() {
-        insertRecord(
-            AppConfig.type_sys_word,
-            wordName = wordsList[wordsIndex].name,
-            wordUs = wordsList[wordsIndex].usphone,
-            wordTrans = wordsList[wordsIndex].trans?.get(0).toString()
-        )
-        wordsIndex++
-        userData = UserBean(
-            coin = userData.coin + 10,
-            wordNum = userData.wordNum + 1,
-            nickName = userData.nickName,//昵称
-            avatar = userData.avatar,//头像
-            frame = userData.frame,
-            veh = userData.veh
-        )
+
+        if (wordsIndex <= wordsList.size - 1) {
+            insertRecord(
+                AppConfig.type_sys_word,
+                wordName = wordsList[wordsIndex].name,
+                wordUs = wordsList[wordsIndex].usphone,
+                wordTrans = wordsList[wordsIndex].trans?.get(0).toString()
+            )
+            wordsIndex++
+            userData = UserBean(
+                coin = userData.coin + 10,
+                wordNum = userData.wordNum + 1,
+                nickName = userData.nickName,//昵称
+                avatar = userData.avatar,//头像
+                frame = userData.frame,
+                veh = userData.veh
+            )
+        } else {
+            insertRecord(
+                AppConfig.type_sys_word, text = "单词全部学完了"
+            )
+        }
+
+
     }
 
     fun creatAQ() {
@@ -603,10 +616,13 @@ class MainVM : BaseViewModel() {
     }
 
     fun creatLuxun() {
-        insertRecord(
-            AppConfig.type_sys_text, text = luxunList[luxunIndex], avatar = 100, nickName = "鲁迅"
-        )
-        luxunIndex++
+        if (luxunIndex <= luxunList.size - 1) {
+            insertRecord(
+                AppConfig.type_sys_text, text = luxunList[luxunIndex], avatar = 100, nickName = "鲁迅"
+            )
+            luxunIndex++
+        }
+
     }
 
 

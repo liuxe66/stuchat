@@ -10,6 +10,7 @@ import java.io.Serializable
  *  description :
  */
 data class UserBean(
+    var userId:Int = 0,
     var nickName: String = "",//昵称
     var avatar: Int = 0,//头像
     var coin: Int = 0,//金币

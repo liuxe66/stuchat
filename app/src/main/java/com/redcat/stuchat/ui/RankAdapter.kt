@@ -9,6 +9,7 @@ import coil.transform.CircleCropTransformation
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.redcat.stuchat.R
 import com.redcat.stuchat.app.AppConfig
+import com.redcat.stuchat.app.RedCatApp
 import com.redcat.stuchat.data.bean.UserBean
 import com.redcat.stuchat.databinding.ItemRankBinding
 import kotlinx.coroutines.NonDisposableHandle
@@ -30,6 +31,11 @@ class RankAdapter():BaseQuickAdapter<UserBean,RankAdapter.VH>() {
 
     override fun onBindViewHolder(holder: VH, position: Int, item: UserBean?) {
        holder.binding?.apply {
+           if (item?.userId == 0){
+
+           } else {
+
+           }
            ivPhoto.load(AppConfig.getPhoto(item?.avatar)){
                transformations(CircleCropTransformation())
            }

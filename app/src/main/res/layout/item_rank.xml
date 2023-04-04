@@ -8,9 +8,9 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/con_rank_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape_left_text_bg"
         android:paddingStart="16dp"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
