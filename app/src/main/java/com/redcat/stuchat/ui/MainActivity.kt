@@ -84,13 +84,7 @@ class MainActivity : BaseDataBindingActivity() {
 
 
                 })
-                isLearnWordData.observe(this@MainActivity, Observer {
-                    if (it) {
 
-                    } else {
-
-                    }
-                })
             }
 
 

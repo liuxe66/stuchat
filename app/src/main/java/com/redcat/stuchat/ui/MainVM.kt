@@ -52,7 +52,6 @@ class MainVM : BaseViewModel() {
 
     //模式 true 学习 false 闲聊
     var isLearnWord = false
-    var isLearnWordData = MutableLiveData<Boolean>()
 
     //每页显示
     var pageLimit = 20
@@ -252,7 +251,6 @@ class MainVM : BaseViewModel() {
         scrollToBottom.value = true
         recordData.value = recordList
         initFinish.value = System.currentTimeMillis()
-        isLearnWordData.value = isLearnWord
     }
 
     /**
@@ -375,7 +373,15 @@ class MainVM : BaseViewModel() {
                 timestamp = record.timestamp
             )
         )
-
+        if (isLearnWord) {
+            if (record.type == AppConfig.type_sys_word) {
+                scrollToBottom.value = true
+                recordData.value = recordList
+            }
+        } else {
+            scrollToBottom.value = true
+            recordData.value = recordList
+        }
     }
 
     /**
@@ -419,15 +425,7 @@ class MainVM : BaseViewModel() {
             addTimestamp(record)
         }
 
-        if (!isLearnWord) {
-            scrollToBottom.value = true
-            recordData.value = recordList
-        } else {
-            if (type == AppConfig.type_sys_word) {
-                scrollToBottom.value = true
-                recordData.value = recordList
-            }
-        }
+
 
     }
 
@@ -623,15 +621,5 @@ class MainVM : BaseViewModel() {
             luxunIndex++
         }
 
-    }
-
-
-    /**
-     * 切换模式 isLearn   true 学习模式  false 闲聊模式
-     */
-    fun changeLearnModel() {
-        isLearnWord = !isLearnWord
-        isLearnWordData.value = isLearnWord
-        getRecords()
     }
 }
