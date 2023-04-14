@@ -14,6 +14,7 @@ import kotlin.reflect.KProperty
 class PrefUtils<T>(val name: String, private val default: T) : ReadWriteProperty<Any?, T> {
 
     companion object {
+        const val prefWordLevel = "preWordLevel"
         const val prefWordIndex = "preWordIndex"
         const val prefWordList = "preWordList"
         const val prefaqIndex = "preaqIndex"
